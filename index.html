@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة متابعة أعمال الطلاب الرقمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header-container">
+        <div class="logo-section">
+            <div class="logo-dots">
+                <div class="dot-row"><div class="dot"></div></div>
+                <div class="dot-row"><div class="dot"></div><div class="dot dot-large"></div></div>
+                <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot dot-large"></div></div>
+                <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot dot-large"></div></div>
+                <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot dot-large"></div></div>
+            </div>
+            <div class="ministry-text">
+                <p class="ministry-text-ar">وزارة التعليم</p>
+                <p class="ministry-text-en">Ministry of Education</p>
+            </div>
+        </div>
+        <h1 class="main-title">منصة متابعة أعمال الطلاب الرقمية</h1>
+        <div class="header-spacer"></div>
+    </header>
+
+    <div class="school-info">
+        المملكة العربية السعودية – إدارة تعليم جدة – مدرسة معن بن عدي الابتدائية – إعداد وتصميم الأستاذ / محمد حسين جابر القحطاني
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" data-tab="form1">متابعة أعمال الطلاب التفصيلي</button>
+        <button class="tab-btn" data-tab="form2">كشف درجات الطلاب النهائي</button>
+    </div>
+
+    <div id="form1" class="tab-content active">
+        <div class="form-section">
+            <h2 class="form-title">متابعة أعمال الطلاب التفصيلي</h2>
+            
+            <div class="form-controls">
+                <div class="control-group">
+                    <label for="academicYear1">السنة الدراسية</label>
+                    <select id="academicYear1">
+                        <option value="1446">1446</option>
+                        <option value="1447">1447</option>
+                        <option value="1448">1448</option>
+                        <option value="1449">1449</option>
+                        <option value="1450">1450</option>
+                        <option value="1451">1451</option>
+                        <option value="1452">1452</option>
+                        <option value="1453">1453</option>
+                        <option value="1454">1454</option>
+                        <option value="1455">1455</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="period1">الفترة</label>
+                    <select id="period1">
+                        <option value="الأولى">الأولى</option>
+                        <option value="الثانية">الثانية</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="classNumber1">رقم الفصل</label>
+                    <input type="number" id="classNumber1" min="1" max="10" value="1">
+                </div>
+                <div class="control-group">
+                    <div class="grade-display">الصف: السادس الابتدائي</div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h3>إضافة طالب</h3>
+                <div class="add-student-form">
+                    <input type="text" id="studentName1" placeholder="اسم الطالب">
+                    <button id="addStudent1" class="btn btn-primary">إضافة طالب</button>
+                </div>
+                <div class="batch-actions">
+                    <button id="addBatch1" class="btn btn-secondary">إضافة دفعة</button>
+                    <label class="btn btn-secondary btn-upload">
+                        <span class="btn-icon">📁</span> رفع Excel/CSV
+                        <input type="file" id="csvUpload1" accept=".csv,.xlsx,.xls" hidden>
+                    </label>
+                    <button id="exportCSV1" class="btn btn-success">
+                        <span class="btn-icon">📊</span> تصدير Excel
+                    </button>
+                    <button id="exportPDF1" class="btn btn-info">
+                        <span class="btn-icon">📄</span> تصدير PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="studentsTable1">
+                    <thead>
+                        <tr>
+                            <th>التسلسل</th>
+                            <th>اسم الطالب</th>
+                            <th>صحة التلاوة<br>(0-8)</th>
+                            <th>تطبيقات التجويد<br>(0-5)</th>
+                            <th>جودة الحفظ<br>(0-7)</th>
+                            <th>واجبات<br>(0-15)</th>
+                            <th>مهام أدائية<br>(0-10)</th>
+                            <th>المشاركة والتفاعل<br>(0-15)</th>
+                            <th>الاختبار الأول<br>(0-40)</th>
+                            <th>الاختبار الثاني<br>(0-40)</th>
+                            <th>متوسط الاختبارين<br>(40)</th>
+                            <th>المجموع الكلي<br>(100)</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody1"></tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button id="publishBtn1" class="btn btn-publish">نشر النتائج</button>
+                <button id="clearAll1" class="btn btn-danger">مسح جميع البيانات</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="form2" class="tab-content">
+        <div class="form-section">
+            <h2 class="form-title">كشف درجات الطلاب النهائي</h2>
+            
+            <div class="form-controls">
+                <div class="control-group">
+                    <label for="academicYear2">السنة الدراسية</label>
+                    <select id="academicYear2">
+                        <option value="1446">1446</option>
+                        <option value="1447">1447</option>
+                        <option value="1448">1448</option>
+                        <option value="1449">1449</option>
+                        <option value="1450">1450</option>
+                        <option value="1451">1451</option>
+                        <option value="1452">1452</option>
+                        <option value="1453">1453</option>
+                        <option value="1454">1454</option>
+                        <option value="1455">1455</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="period2">الفترة</label>
+                    <select id="period2">
+                        <option value="الأولى">الأولى</option>
+                        <option value="الثانية">الثانية</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="classNumber2">رقم الفصل</label>
+                    <input type="number" id="classNumber2" min="1" max="10" value="1">
+                </div>
+                <div class="control-group">
+                    <div class="grade-display">الصف: السادس الابتدائي</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <p><strong>ملاحظة:</strong> هذا الكشف يعرض ملخص الدرجات النهائية:</p>
+                <ul>
+                    <li>المهام الأدائية والمشاركة والتفاعل (40) = مهام أدائية + واجبات + مشاركة وتفاعل</li>
+                    <li>تقويمات شفهية وتحريرية (60) = متوسط الاختبارين + جودة الحفظ + صحة التلاوة + تطبيقات التجويد</li>
+                    <li>المجموع (100) = العمود الأول + العمود الثاني</li>
+                </ul>
+            </div>
+
+            <div class="input-section">
+                <h3>إضافة طالب</h3>
+                <div class="add-student-form">
+                    <input type="text" id="studentName2" placeholder="اسم الطالب">
+                    <button id="addStudent2" class="btn btn-primary">إضافة طالب</button>
+                </div>
+                <div class="batch-actions">
+                    <button id="addBatch2" class="btn btn-secondary">إضافة دفعة</button>
+                    <label class="btn btn-secondary btn-upload">
+                        <span class="btn-icon">📁</span> رفع Excel/CSV
+                        <input type="file" id="csvUpload2" accept=".csv,.xlsx,.xls" hidden>
+                    </label>
+                    <button id="exportCSV2" class="btn btn-success">
+                        <span class="btn-icon">📊</span> تصدير Excel
+                    </button>
+                    <button id="exportPDF2" class="btn btn-info">
+                        <span class="btn-icon">📄</span> تصدير PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="studentsTable2" class="simple-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الطالب</th>
+                            <th>اسم الطالب</th>
+                            <th>المهام الأدائية والمشاركة والتفاعل<br>(40)</th>
+                            <th>تقويمات شفهية وتحريرية<br>(60)</th>
+                            <th>المجموع<br>(100)</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody2"></tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button id="publishBtn2" class="btn btn-publish">نشر النتائج</button>
+                <button id="clearAll2" class="btn btn-danger">مسح جميع البيانات</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="batchModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>إضافة دفعة من الطلاب</h3>
+            <p>أدخل أسماء الطلاب (كل اسم في سطر جديد):</p>
+            <textarea id="batchNames" rows="10" placeholder="أحمد محمد&#10;سعيد علي&#10;خالد عبدالله"></textarea>
+            <button id="confirmBatch" class="btn btn-primary">إضافة الجميع</button>
+        </div>
+    </div>
+
+    <div id="alertModal" class="modal">
+        <div class="modal-content alert-modal">
+            <span class="close-modal">&times;</span>
+            <div class="alert-icon">&#10004;</div>
+            <h3>تم بنجاح</h3>
+            <p id="alertMessage">تم إرسال النتائج إلى أولياء الأمور والإدارة</p>
+            <button class="btn btn-primary close-alert">حسناً</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
