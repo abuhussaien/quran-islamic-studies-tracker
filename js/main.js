@@ -2,6 +2,110 @@ document.addEventListener('DOMContentLoaded', function() {
     let students1 = JSON.parse(localStorage.getItem('students1')) || [];
     let students2 = JSON.parse(localStorage.getItem('students2')) || [];
     let currentForm = 1;
+    const fullMarkFields = {
+        1: [
+            ['recitation', 'صحة التلاوة', 8],
+            ['tajweed', 'تطبيقات التجويد', 5],
+            ['memorization', 'جودة الحفظ', 7],
+            ['homework', 'الواجبات', 15],
+            ['performance', 'المهام الأدائية', 10],
+            ['participation', 'المشاركة والتفاعل', 15],
+            ['exam1', 'الاختبار الأول', 40],
+            ['exam2', 'الاختبار الثاني', 40]
+        ],
+        2: [
+            ['tasksScore', 'المهام الأدائية والمشاركة والتفاعل', 40],
+            ['assessmentsScore', 'التقويمات الشفهية والتحريرية', 60]
+        ]
+    };
+    const fullMarkUndo = {1: null, 2: null};
+
+    // Keep the bulk-mark feature in this file so existing installations need
+    // only replace js/main.js; the original tables and storage keys stay intact.
+    function setupFullMarkButtons(formNum) {
+        const table = document.getElementById(`studentsTable${formNum}`);
+        const headings = table.querySelectorAll('thead th');
+        const toolbar = document.createElement('div');
+        toolbar.className = 'full-mark-toolbar';
+        const fillAll = document.createElement('button');
+        fillAll.type = 'button';
+        fillAll.className = 'full-mark-all';
+        fillAll.textContent = '✓ الدرجة الكاملة لجميع البنود';
+        fillAll.addEventListener('click', () => fillFullMarks(formNum));
+        const undo = document.createElement('button');
+        undo.type = 'button';
+        undo.id = `fullMarkUndo${formNum}`;
+        undo.className = 'full-mark-undo';
+        undo.textContent = '↶ تراجع عن التعبئة';
+        undo.disabled = true;
+        undo.addEventListener('click', () => undoFullMarks(formNum));
+        const status = document.createElement('span');
+        status.id = `fullMarkStatus${formNum}`;
+        status.setAttribute('role', 'status');
+        status.setAttribute('aria-live', 'polite');
+        status.textContent = 'التعبئة تشمل جميع طلاب هذا الجدول، ويمكن تعديل كل درجة بعدها.';
+        toolbar.append(fillAll, undo, status);
+        table.parentElement.parentElement.insertBefore(toolbar, table.parentElement);
+        fullMarkFields[formNum].forEach(([field, label, max], index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'full-mark-column';
+            button.textContent = `✓ ${max} للجميع`;
+            button.title = `تعبئة ${label} بالدرجة ${max} لجميع طلاب هذا الجدول`;
+            button.setAttribute('aria-label', button.title);
+            button.addEventListener('click', () => fillFullMarks(formNum, field));
+            headings[index + 2].appendChild(button);
+        });
+    }
+
+    function setFullMarkStatus(formNum, message) {
+        document.getElementById(`fullMarkStatus${formNum}`).textContent = message;
+        document.getElementById(`fullMarkUndo${formNum}`).disabled = !fullMarkUndo[formNum];
+    }
+
+    function fillFullMarks(formNum, field) {
+        const students = formNum === 1 ? students1 : students2;
+        if (!students.length) {
+            setFullMarkStatus(formNum, 'أضف الطلاب أولاً لتعبئة درجاتهم.');
+            return;
+        }
+        const fields = fullMarkFields[formNum].filter(item => !field || item[0] === field);
+        if (!fields.length) return;
+        const previous = students.map(student => ({...student}));
+        const updated = students.map(student => {
+            const copy = {...student};
+            fields.forEach(([key, , max]) => { copy[key] = max; });
+            return copy;
+        });
+        // Persist first: a storage failure must leave current grades untouched.
+        try {
+            localStorage.setItem(`students${formNum}`, JSON.stringify(updated));
+        } catch (error) {
+            setFullMarkStatus(formNum, 'تعذّر حفظ الدرجات؛ لم تُغيّر التعبئة أي درجة.');
+            return;
+        }
+        fullMarkUndo[formNum] = previous;
+        if (formNum === 1) students1 = updated;
+        else students2 = updated;
+        renderTable(formNum);
+        setFullMarkStatus(formNum, `تم حفظ الدرجة الكاملة ${field ? 'لبند ' + fields[0][1] : 'لجميع البنود'} لعدد ${students.length} طالب. يمكنك تعديل أي درجة أو التراجع عن آخر تعبئة.`);
+    }
+
+    function undoFullMarks(formNum) {
+        const previous = fullMarkUndo[formNum];
+        if (!previous) return;
+        try {
+            localStorage.setItem(`students${formNum}`, JSON.stringify(previous));
+        } catch (error) {
+            setFullMarkStatus(formNum, 'تعذّر حفظ التراجع؛ بقيت الدرجات الحالية كما هي.');
+            return;
+        }
+        if (formNum === 1) students1 = previous;
+        else students2 = previous;
+        fullMarkUndo[formNum] = null;
+        renderTable(formNum);
+        setFullMarkStatus(formNum, 'تم التراجع عن آخر تعبئة واستعادة الدرجات السابقة.');
+    }
 
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -467,8 +571,30 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             localStorage.setItem('students2', JSON.stringify(students2));
         }
+        // A later manual edit/import/add/delete must never be overwritten by undo.
+        fullMarkUndo[formNum] = null;
+        if (document.getElementById(`fullMarkUndo${formNum}`)) {
+            setFullMarkStatus(formNum, 'تم حفظ التعديل. يمكنك استخدام أزرار الدرجة الكاملة عند الحاجة.');
+        }
     }
 
+    const fullMarkStyle = document.createElement('style');
+    fullMarkStyle.textContent = `
+        .full-mark-column {display:block;margin:8px auto 0;padding:6px 9px;border:1px solid #fff9;border-radius:7px;background:#fff;color:#075b4a;font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+        .full-mark-column:hover {background:#dcfce7}
+        .full-mark-toolbar {display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:12px 0;padding:12px;border:1px solid #b6dfd0;border-radius:10px;background:#f0fdf4;color:#14532d}
+        .full-mark-toolbar button {padding:9px 14px;border:0;border-radius:8px;font:inherit;font-weight:700;cursor:pointer}
+        .full-mark-all {background:#087e60;color:white}
+        .full-mark-undo {background:#e2e8f0;color:#1e293b}
+        .full-mark-undo:disabled {opacity:.45;cursor:default}
+        .full-mark-column:focus-visible,.full-mark-toolbar button:focus-visible {outline:3px solid #e6ad18;outline-offset:3px}
+        .full-mark-toolbar span {font-size:13px}
+        @media print {.full-mark-column,.full-mark-toolbar {display:none!important}}
+    `;
+    document.head.appendChild(fullMarkStyle);
+    setupFullMarkButtons(1);
+    setupFullMarkButtons(2);
     renderTable(1);
     renderTable(2);
 });
+
